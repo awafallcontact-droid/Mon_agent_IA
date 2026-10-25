@@ -108,7 +108,9 @@ La réponse contient le texte de l’agent dans le champ `reponse`.
 
 ## Déploiement
 
-Aucun lien de déploiement public n’est actuellement configuré dans le projet. L’interface et l’API doivent être déployées séparément ou rendues accessibles via des URL publiques. Après le déploiement de l’API, remplacez dans `index.html` l’URL locale `http://127.0.0.1:8000/chat` par l’URL publique de la route `/chat`.
+L’interface est déployée sur GitHub Pages : [https://awafallcontact-droid.github.io/Mon_agent_IA/](https://awafallcontact-droid.github.io/Mon_agent_IA/).
+
+Pour que le chat fonctionne en ligne, l’API FastAPI doit également être déployée et accessible publiquement. Remplacez alors dans `index.html` l’URL locale `http://127.0.0.1:8000/chat` par l’URL publique de la route `/chat`.
 
 ## Sécurité
 
