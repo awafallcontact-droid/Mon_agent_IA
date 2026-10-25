@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Agent IA Rodium</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #chat-container { width: 400px; height: 600px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+        #chat-header { background: #007bff; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; }
+        #chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px 15px; border-radius: 20px; max-width: 80%; line-height: 1.4; }
+        .user-message { background: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 0; }
+        .bot-message { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 0; }
+        #chat-input-container { display: flex; padding: 10px; border-top: 1px solid #ddd; background: #fff; }
+        #chat-input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; font-size: 1em; }
+        #send-btn { background: #007bff; color: white; border: none; padding: 10px 15px; margin-left: 10px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        #send-btn:hover { background: #0056b3; }
+        .loading { font-style: italic; color: #888; font-size: 0.9em; align-self: flex-start; display: none;}
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-header">Agent IA Rodium</div>
+    <div id="chat-messages">
+        <div class="message bot-message">Bonjour ! Je suis votre agent IA. Comment puis-je vous aider aujourd'hui ? (Météo, recherche web, etc.)</div>
+    </div>
+    <div id="loading-indicator" class="loading">L'agent réfléchit...</div>
+    <div id="chat-input-container">
+        <input type="text" id="chat-input" placeholder="Écrivez votre message..." onkeypress="handleKeyPress(event)">
+        <button id="send-btn" onclick="sendMessage()">Envoyer</button>
+    </div>
+</div>
+
+<script>
+    // URL de votre backend FastAPI (à changer quand vous déploierez le backend)
+    const API_URL = "http://127.0.0.1:8000/chat";
+
+    async function sendMessage() {
+        const inputField = document.getElementById("chat-input");
+        const messageText = inputField.value.trim();
+        if (!messageText) return;
+
+        // Afficher le message de l'utilisateur
+        addMessage(messageText, "user-message");
+        inputField.value = "";
+
+        // Afficher l'indicateur de chargement
+        document.getElementById("loading-indicator").style.display = "block";
+
+        try {
+            // Envoyer la requête au backend FastAPI
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: messageText })
+            });
+
+            const data = await response.json();
+            
+            // Masquer le chargement et afficher la réponse
+            document.getElementById("loading-indicator").style.display = "none";
+            addMessage(data.reponse, "bot-message");
+
+        } catch (error) {
+            document.getElementById("loading-indicator").style.display = "none";
+            addMessage("Erreur : Impossible de contacter le serveur de l'agent.", "bot-message");
+            console.error("Erreur API:", error);
+        }
+    }
+
+    function addMessage(text, className) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${className}`;
+        messageDiv.textContent = text;
+        document.getElementById("chat-messages").appendChild(messageDiv);
+        
+        // Faire défiler vers le bas
+        const messagesContainer = document.getElementById("chat-messages");
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === "Enter") sendMessage();
+    }
+</script>
+
+</body>
+</html>
